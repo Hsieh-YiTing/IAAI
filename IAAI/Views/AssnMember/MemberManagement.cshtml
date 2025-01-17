@@ -1,0 +1,438 @@
+﻿@model IAAI.Models.ViewModel.AssnMemberVM.AssnMemberVM
+
+@section HeaderTitle {
+    協會成員管理
+}
+
+<div class="card">
+    <div class="card-header">
+        <!-- Button trigger modal -->
+        <div style="display: flex; gap: 30px;">
+            <button id="openJobTitleBtn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobTitle">
+                新增職稱
+            </button>
+            <button id="openMemberBtn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editJobTitle">
+                編輯職稱
+            </button>
+            <button id="openMemberBtn" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAssnMember">
+                新增成員
+            </button>
+        </div>
+    </div>
+    <div class="card-block table-border-style">
+        <div class="table-responsive">
+            <table class="table table-hover" id="assnMemberTable">
+                <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>職稱</th>
+                        <th>姓名</th>
+                        <th>性別</th>
+                        <th>經歷</th>
+                        <th>操作</th>
+                        <th>建立時間</th>
+                        <th>更新時間</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.AssnMemberInfo)
+                    {
+                        <tr data-id="@item.Id">
+                            <th scope="row">@item.Id</th>
+                            <td data-jobTitleId="@item.JobTitleId">@item.JobTitle</td>
+                            <td>@item.Name</td>
+                            <td>@(item.Gender == "M" ? "男" : "女")</td>
+                            <td style="white-space: pre-line;">@item.Incumbent</td>
+                            <td>
+                                <button type="button" id="editBtn" class="btn btn-info btn-round btn-sm" data-id="@item.Id" data-bs-toggle="modal" data-bs-target="#editAssnMember">編輯</button>
+                                <button type="button" id="deleteBtn" class="btn btn-danger btn-round btn-sm" data-id="@item.Id">刪除</button>
+                            </td>
+                            <td>@item.CreateTime.ToShortDateString()</td>
+                            <td>@item.UpdateTime.ToShortDateString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 新增職稱Modal -->
+<div class="modal fade" id="addJobTitle" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">新增職稱</h5>
+                <button type="button" class="btn-close editOrAddBtn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("AddJobTitle", "AssnMember", FormMethod.Post, new { id = "addJobTitleForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.AddJobTitle.NewJobTitle, new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.AddJobTitle.NewJobTitle, new { @class = "form-control jobTitleBox" })
+                            @Html.ValidationMessageFor(m => m.AddJobTitle.NewJobTitle, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary editOrAddBtn-close" data-bs-dismiss="modal">關閉視窗</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">新增職稱</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 編輯職稱Modal -->
+<div class="modal fade" id="editJobTitle" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">編輯職稱</h5>
+                <button type="button" class="btn-close editOrAddBtn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("EditJobTitle", "AssnMember", FormMethod.Post, new { id = "editJobTitleForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.EditJobTitle.SelectedJobTitle, new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.DropDownListFor(m => m.EditJobTitle.SelectedJobTitle, Model.EditJobTitle.Option, "選擇職稱", new { @class = "form-control jobTitleSelect" })
+                            @Html.ValidationMessageFor(m => m.EditJobTitle.SelectedJobTitle, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.EditJobTitle.NewJobTitle, "輸入新的職稱 : ", new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.EditJobTitle.NewJobTitle, new { @class = "form-control jobTitleBox" })
+                            @Html.ValidationMessageFor(m => m.EditJobTitle.NewJobTitle, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary editOrAddBtn-close" data-bs-dismiss="modal">關閉視窗</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">編輯職稱</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增成員Modal -->
+<div class="modal fade" id="addAssnMember" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">新增成員</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("AddAssnMember", "AssnMember", FormMethod.Post, new { id = "addMemberForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.AddAssnMember.SelectedJobTitle, new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.DropDownListFor(m => m.AddAssnMember.SelectedJobTitle, Model.AddAssnMember.Option, "選擇職稱", new { @class = "form-control jobTitleSelect" })
+                            @Html.ValidationMessageFor(m => m.AddAssnMember.SelectedJobTitle, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.AddAssnMember.Name, new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.AddAssnMember.Name, new { @class = "form-control assnMemberBox" })
+                            @Html.ValidationMessageFor(m => m.AddAssnMember.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.AddAssnMember.Gender, new { @class = "col-sm-3 col-form-label", style = "text-align : left;" })
+                        <div class="form-check form-check-inline">
+                            @Html.RadioButtonFor(m => m.AddAssnMember.Gender, "M", new { @class = "form-check-input gender", @id = "male" })
+                            <label class="form-check-label text-left" for="male">男</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            @Html.RadioButtonFor(m => m.AddAssnMember.Gender, "F", new { @class = "form-check-input gender", @id = "female" })
+                            <label class="form-check-label" for="female">女</label>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.AddAssnMember.Gender, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.AddAssnMember.Incumbent, new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.TextAreaFor(m => m.AddAssnMember.Incumbent, new { @class = "form-control assnMemberBox" })
+                            @Html.ValidationMessageFor(m => m.AddAssnMember.Incumbent, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary editOrAddBtn-close" data-bs-dismiss="modal">關閉視窗</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">新增成員</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 編輯成員Modal -->
+<div class="modal fade" id="editAssnMember" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">編輯成員</h5>
+                <button type="button" class="btn-close editOrAddBtn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("EditAssnMember", "AssnMember", FormMethod.Post, new { @id = "editAssnMemberForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group row">
+                        @Html.HiddenFor(m => m.EditAssnMember.Id)
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.EditAssnMember.SelectedJobTitle, new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.DropDownListFor(m => m.EditAssnMember.SelectedJobTitle, Model.EditAssnMember.Option, "選擇職稱", new { @class = "form-control jobTitleSelect" })
+                            @Html.ValidationMessageFor(m => m.EditAssnMember.SelectedJobTitle, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.EditAssnMember.Name, new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.TextBoxFor(m => m.EditAssnMember.Name, new { @class = "form-control assnMemberBox" })
+                            @Html.ValidationMessageFor(m => m.EditAssnMember.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.EditAssnMember.Gender, new { @class = "col-sm-3 col-form-label", style = "text-align : left;" })
+                        <div class="form-check form-check-inline">
+                            @Html.RadioButtonFor(m => m.EditAssnMember.Gender, "M", new { @class = "form-check-input gender editGender", @id = "editMale" })
+                            <label class="form-check-label text-left" for="editMale">男</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            @Html.RadioButtonFor(m => m.EditAssnMember.Gender, "F", new { @class = "form-check-input gender editGender", @id = "editFemale" })
+                            <label class="form-check-label" for="editFemale">女</label>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.EditAssnMember.Gender, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(m => m.EditAssnMember.Incumbent, new { @class = "col-sm-3 col-form-label", style = "text-align : center;" })
+                        <div class="col-sm-8">
+                            @Html.TextAreaFor(m => m.EditAssnMember.Incumbent, new { @class = "form-control assnMemberBox" })
+                            @Html.ValidationMessageFor(m => m.EditAssnMember.Incumbent, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary editOrAddBtn-close" data-bs-dismiss="modal">關閉視窗</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">編輯成員</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- 提交新增職稱表單AJAX -->
+    <script>
+        $(document).ready(function () {
+            $("#addJobTitleForm").submit(function (event) {
+                event.preventDefault();
+                $.post($(this).attr("action"), $(this).serialize(), function (response) {
+                    if (response.isSuccess) {
+                        alert(response.message);
+
+                        // 新增成功後更新全部JobTitle選單
+                        $(".jobTitleSelect").empty();
+                        $(".jobTitleSelect").append(new Option("選擇職稱", ""));
+                        $.each(response.option, function (index, item) {
+                            $(".jobTitleSelect").append(new Option(item.Text, item.Value));
+                        });
+
+                        // 新增成功後清空欄位
+                        $("#AddJobTitle_NewJobTitle").val("");
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 提交編輯職稱表單AJAX -->
+    <script>
+        $(document).ready(function () {
+            $("#editJobTitleForm").submit(function (event) {
+                event.preventDefault();
+                var jobTitleId = $("#EditJobTitle_SelectedJobTitle").val();
+                $.post($(this).attr("action"), $(this).serialize(), function (response) {
+                    if (response.isSuccess) {
+                        alert(response.message);
+
+                        // 編輯成功後更新全部JobTitle選單
+                        $(".jobTitleSelect").empty();
+                        $(".jobTitleSelect").append(new Option("選擇職稱", ""));
+                        $.each(response.option, function (index, item) {
+                            $('.jobTitleSelect').append(new Option(item.Text, item.Value));
+                        });
+
+                        // 更新表格中的職稱
+                        var rows = $(`td[data-jobTitleId="${jobTitleId}"]`);
+                        $.each(rows, function (index, item) {
+                            $(item).text(response.titleName);
+                        });
+
+                        // 選單更新後回到預設值以及欄位清空
+                        $("#EditJobTitle_SelectedJobTitle").val("");
+                        $("#EditJobTitle_NewJobTitle").val("");
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 提交新增成員表單AJAX -->
+    <script>
+        $(document).ready(function () {
+            $("#addMemberForm").submit(function (event) {
+                event.preventDefault();
+                $.post($(this).attr("action"), $(this).serialize(), function (response) {
+                    if (response.isSuccess) {
+                        alert(response.message);
+
+                        // 新增成功後清空欄位
+                        $("#AddOrEditAssnMember_SelectedJobTitle").val("");
+                        $(".gender").prop("checked", false);
+                        $(".assnMemberBox").val("");
+
+                        // 處理時間戳
+                        var createTimeStamp = response.latestMember.CreateTime.match(/\/Date\((\d+)\)\//)[1];
+                        var updateTimeStamp = response.latestMember.UpdateTime.match(/\/Date\((\d+)\)\//)[1];
+
+                        var createDate = new Date(parseInt(createTimeStamp)).toLocaleDateString("zh-TW");
+                        var updateDate = new Date(parseInt(updateTimeStamp)).toLocaleDateString("zh-TW");
+
+                        // 新增後刷新表格
+                        var newRow = `
+                                                        <tr data-id="${response.latestMember.Id}">
+                                                        <th scope="row">${response.latestMember.Id}</th>
+                                                        <td data-jobTitleId="${response.latestMember.JobTitleId}">${response.latestMember.JobTitle}</td>
+                                                        <td>${response.latestMember.Name}</td>
+                                                        <td>${response.latestMember.Gender === "M" ? "男" : "女"}</td>
+                                                        <td style="white-space: pre-line;">${response.latestMember.Incumbent}</td>
+                                                        <td>
+                                                            <button type="button" id="editBtn" data-id="${response.latestMember.Id}" class="btn btn-info btn-round btn-sm" data-bs-toggle="modal" data-bs-target="#editAssnMember">編輯</button>
+                                                            <button type="button" id="deleteBtn" data-id="${response.latestMember.Id}" class="btn btn-danger btn-round btn-sm">刪除</button>
+                                                        </td>
+                                                        <td>${createDate}</td>
+                                                        <td>${updateDate}</td>
+                                                    </tr>
+                                                    `;
+
+                        $("#assnMemberTable tbody").append(newRow);
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 取得編輯成員資料後添加到欄位 -->
+    <script>
+        $(document).ready(function () {
+            $(document).on("click", "#editBtn", function () {
+                var memberId = $(this).data("id");
+
+                $.get("/AssnMember/GetEditAssnMember", { id: memberId }, function (response) {
+                    if (response.isSuccess) {
+                        $("#EditAssnMember_Id").val(response.data.Id);
+                        $("#EditAssnMember_SelectedJobTitle").val(response.data.JobTitleId);
+                        $("#EditAssnMember_Name").val(response.data.Name);
+                        $(`.editGender[value="${response.data.Gender}"]`).prop("checked", true);
+                        $("#EditAssnMember_Incumbent").val(response.data.Incumbent);
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 提交編輯成員表單AJAX -->
+    <script>
+        $(document).ready(function () {
+            $("#editAssnMemberForm").submit(function (event) {
+                event.preventDefault();
+                $.post($(this).attr("action"), $(this).serialize(), function (response) {
+                    if (response.isSuccess) {
+                        alert(response.message);
+                        // 編輯成功後關閉Modal
+                        $("#editAssnMember").modal("hide");
+
+                        // 更新整列資料並處理時間戳
+                        var createTimeStamp = response.data.CreateTime.match(/\/Date\((\d+)\)\//)[1];
+                        var updateTimeStamp = response.data.UpdateTime.match(/\/Date\((\d+)\)\//)[1];
+
+                        var createDate = new Date(parseInt(createTimeStamp)).toLocaleDateString("zh-TW");
+                        var updateDate = new Date(parseInt(updateTimeStamp)).toLocaleDateString("zh-TW");
+
+                        var row = $(`tr[data-id="${response.data.Id}"]`);
+                        row.find("td:eq(0)").text(response.data.JobTitle).attr("data-jobTitleId", response.data.JobTitleId);
+                        row.find("td:eq(1)").text(response.data.Name);
+                        row.find("td:eq(2)").text(response.data.Gender === "M" ? "男" : "女");
+                        row.find("td:eq(3)").text(response.data.Incumbent);
+                        row.find("td:eq(5)").text(createDate);
+                        row.find("td:eq(6)").text(updateDate);
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 刪除AJAX -->
+    <script>
+        $(document).ready(function () {
+            $(document).on("click", "#deleteBtn", function () {
+                var memberId = $(this).data("id");
+
+                if (confirm("確定刪除嗎?")) {
+                    $.post("/AssnMember/DeleteAssnMember", { id: memberId }, function (response) {
+                        if (response.isSuccess) {
+                            alert(response.message);
+
+                            // 依據data-id= memberId找到對應的按鈕並刪除整列
+                            $(`button[data-id="${memberId}"]`).closest("tr").remove();
+                        }
+                        else {
+                            alert(response.message);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <!-- 關閉Modal時清空欄位 -->
+    <script>
+        $(document).ready(function () {
+            $(".editOrAddBtn-close").click(function () {
+                $(".jobTitleSelect").val("");
+                $(".jobTitleBox").val("");
+                $(".gender").prop("checked", false);
+                $(".assnMemberBox").val("");
+            });
+        });
+    </script>
+}
