@@ -138,6 +138,7 @@
     <Compile Include="Models\DbModel\AssnDB\AssnJobTitle.cs" />
     <Compile Include="Models\DbModel\AssnDB\AssnMember.cs" />
     <Compile Include="Models\DbModel\DbConnect.cs" />
+    <Compile Include="Models\DbModel\NewsDB\AssnNews.cs" />
     <Compile Include="Models\ViewModel\AssnMemberVM\AssnMemberInfoVM.cs" />
     <Compile Include="Models\ViewModel\AssnMemberVM\AssnMemberVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -2326,6 +2327,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Models\ViewModel\UserVM\" />
     <Folder Include="Scripts\plugins\morris.js\css\" />
+    <Folder Include="UploadImages\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\org\bootstrap.rtl.min.css.map" />

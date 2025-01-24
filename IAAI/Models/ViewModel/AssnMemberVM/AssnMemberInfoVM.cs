@@ -1,33 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
 namespace IAAI.Models.ViewModel.AssnMemberVM
 {
-    public class AssnMemberInfoVM
-    {
-        public List<MemberMenu> MemberMenu { get; set; }
-
-        public MemberDetailedInfo MemberDetailedInfo { get; set; }
-    }
-
-    // 協會職稱/成員選單
-    public class MemberMenu
+    public class MemberDetailedInfoVM
     {
         public int SelectJobTitleId { get; set; }
 
         public int SelectAssnMemberId { get; set; }
 
-        public List<SelectListItem> JobTitleOption { get; set; }
+        public IEnumerable<SelectListItem> JobTitleOption { get; set; }
 
-        public List<SelectListItem> AssnMemberOption { get; set; }
-    }
+        public IEnumerable<SelectListItem> AssnMemberOption { get; set; }
 
-    // 協會成員詳細資料
-    public class MemberDetailedInfo
-    {
+        [Required(ErrorMessage = "必須要輸入資料")]
+        [AllowHtml]
         public string Information { get; set; }
     }
 }

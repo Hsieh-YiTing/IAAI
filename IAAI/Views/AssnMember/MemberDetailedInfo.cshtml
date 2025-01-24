@@ -1,5 +1,97 @@
-﻿@model IAAI.Models.ViewModel.AssnMemberVM.AssnMemberInfoVM
+﻿@model IAAI.Models.ViewModel.AssnMemberVM.MemberDetailedInfoVM
 
 @section HeaderTitle {
     成員詳細資料
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex" style="gap: 30px;">
+            <div style="width: 15%;">
+                @Html.DropDownListFor(m => m.SelectJobTitleId, Model.JobTitleOption, "選擇職稱", new { @class = "form-control" })
+            </div>
+            <div style="width: 20%;">
+                @Html.DropDownListFor(m => m.SelectAssnMemberId, Model.AssnMemberOption, "選擇成員", new { @class = "form-control" })
+            </div>
+        </div>
+    </div>
+    <div class="card-block table-border-style">
+        @using (Html.BeginForm("UpdateMemberDetailedInfo", "AssnMember", FormMethod.Post, new { @id = "updateMemberDetailedInfoForm" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.TextAreaFor(m => m.Information)
+            <div style="padding: 10px; text-align: center;">
+                <button type="submit" class="btn btn-primary" id="submitBtn">編輯資料</button>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <!-- CKE -->
+    <script>
+        var editor;
+        $(document).ready(function () {
+            editor = CKEDITOR.replace("Information", {
+                height: 400,
+                filebrowserUploadUrl: '@Url.Action("UploadImage", "AssnMember")'
+            });
+        });
+    </script>
+
+    <!-- 依據成員顯示CKE內容 -->
+    <script>
+        $(document).ready(function () {
+            $("#SelectAssnMemberId").on("change", function () {
+                var selectedAssnMemberId = $("#SelectAssnMemberId").val();
+                $.get("/AssnMember/GetMemberDetailedInfo", { memberId: selectedAssnMemberId }, function (response) {
+                    if (response.isSuccess) {
+                        editor.setData(response.detailedInfo);
+                    }
+                    else {
+                        alert(response.detailedInfo);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 提交CKE內容 -->
+    <script>
+        $(document).ready(function () {
+            $("#updateMemberDetailedInfoForm").submit(function (event) {
+                event.preventDefault();
+                editor.updateElement();
+                var formData = $(this).serializeArray();
+                var selectedAssnMemberId = $("#SelectAssnMemberId").val();
+                formData.push({ name: "SelectAssnMemberId", value: selectedAssnMemberId });
+
+                $.post($(this).attr("action"), formData, function (response) {
+                    if (response.isSuccess) {
+                        alert(response.message);
+                        editor.setData(response.data);
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 依據職稱顯示成員 -->
+    <script>
+        $(document).ready(function () {
+            $("#SelectJobTitleId").on("change", function () {
+                var jobTitleId = $(this).val();
+                $.get("/AssnMember/FilterAssnMember", { jobTitleId: jobTitleId }, function (memberOption) {
+                    $("#SelectAssnMemberId").empty();
+                    $("#SelectAssnMemberId").append(new Option("選擇成員", ""));
+                    $.each(memberOption, function (index, item) {
+                        $("#SelectAssnMemberId").append(new Option(item.Text, item.Value));
+                    });
+                });
+            });
+        });
+    </script>
 }

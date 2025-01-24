@@ -210,5 +210,88 @@ namespace IAAI.Services.AssnMemberService
             }
             return (false, "找不到要刪除的編號資料");
         }
+
+        // 詳細成員頁面選單初始化
+        public MemberDetailedInfoVM InitMemberDetailedInfoVM()
+        {
+            var jobTitleOption = db.AssnJobTitle.Select(a => new SelectListItem
+            {
+                Text = a.JobtTitle,
+                Value = a.Id.ToString()
+            }).ToList();
+
+            var assnMemberOption = db.AssnMembers.Select(a => new SelectListItem
+            {
+                Text = a.Name,
+                Value = a.Id.ToString()
+            }).ToList();
+
+            var model = new MemberDetailedInfoVM
+            {
+                JobTitleOption = jobTitleOption,
+                AssnMemberOption = assnMemberOption
+            };
+            return model;
+        }
+
+        // 依據JobTitleId取得成員
+        public IEnumerable<SelectListItem> GetAssnMemberByJobTitleId(int? jobTitleId)
+        {
+            if (jobTitleId != null)
+            {
+                var assnMemberOption = db.AssnMembers.Where(m => m.AssnJobTitleId == jobTitleId).Select(m => new SelectListItem
+                {
+                    Text = m.Name,
+                    Value = m.Id.ToString()
+                }).ToList();
+                return assnMemberOption;
+            }
+            else
+            {
+                var assnMemberOption = db.AssnMembers.Select(a => new SelectListItem
+                {
+                    Text = a.Name,
+                    Value = a.Id.ToString()
+                }).ToList();
+                return assnMemberOption;
+            }
+        }
+
+        // 依據成員取得詳細資料
+        public (bool isSuccess, string detailedInfo) GetMemberDetailedInfo(int memberId)
+        {
+            var member = db.AssnMembers.FirstOrDefault(m => m.Id == memberId);
+
+            if (member != null)
+            {
+                if (member.Information == null)
+                {
+                    return (true, "");
+                }
+                return (true, member.Information);
+            }
+            return (false, "找不到這個成員");
+        }
+
+        // 更新成員詳細資料
+        public (bool isSuccess, string message) UpdateMemberDetailedInfo(int assnMemberId, string memberInfo)
+        {
+            var memberData = db.AssnMembers.FirstOrDefault(m => m.Id == assnMemberId);
+
+            if (memberData != null)
+            {
+                memberData.Information = memberInfo;
+                db.SaveChanges();
+                return (true, "編輯成功");
+            }
+            return (false, "找不到這個使用者");
+        }
+
+        // 取得更新後的成員詳細資料
+        public string GetRevisionMemberDetailedInfo(int assnMemberId)
+        {
+            var memberData = db.AssnMembers.FirstOrDefault(m => m.Id == assnMemberId);
+            return memberData.Information;
+        }
     }
 }
